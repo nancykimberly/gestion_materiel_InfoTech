@@ -1,30 +1,23 @@
 from fastapi import Depends, FastAPI
-
-from app.core.dependencies import (
-    get_current_user,
-    get_current_admin_user
-)
-from app.models import User
-from app.routers.auth import router as auth_router
-from app.routers.admin_users import router as admin_users_router
-from app.routers.materiel import (
-    router as materiels_router,
-    admin_router as admin_materiels_router
-)
-from app.routers.requests import (
-    router as requests_router,
-    admin_router as admin_requests_router
-)
-
-from app.routers.notifications import (
-    router as notifications_router
-)
-
-from app.routers.audit_logs import (
-    router as audit_logs_router
-)
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.dependencies import (
+    get_current_admin_user,
+    get_current_user
+)
+from app.models import User
+from app.routers.admin_users import router as admin_users_router
+from app.routers.audit_logs import router as audit_logs_router
+from app.routers.auth import router as auth_router
+from app.routers.materiel import (
+    admin_router as admin_materiels_router,
+    router as materiels_router
+)
+from app.routers.notifications import router as notifications_router
+from app.routers.requests import (
+    admin_router as admin_requests_router,
+    router as requests_router
+)
 
 app = FastAPI(
     title="InfoTech API",
@@ -32,7 +25,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(auth_router)
+# Inclusion des routeurs
 app.include_router(auth_router)
 app.include_router(admin_users_router)  
 app.include_router(materiels_router)
@@ -42,13 +35,22 @@ app.include_router(admin_requests_router)
 app.include_router(notifications_router)
 app.include_router(audit_logs_router)
 
+# Configuration CORS sécurisée
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+    ],
+    # Autorise automatiquement tous les domaines de prévisualisation et production Vercel
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 @app.get("/")
 def root():
     return {
