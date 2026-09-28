@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database.session import SessionLocal
+from app.core.dependencies import get_current_user, get_db
 from app.models import User
 from app.schemas.auth import LoginRequest, TokenResponse
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import PasswordForgotRequest, UserActivation, UserCreate, UserResponse
+from app.services.notification_service import creer_notification
 from app.core.security import (
     create_access_token,
     get_password_hash,
@@ -17,14 +19,6 @@ router = APIRouter(
     tags=["Authentification"]
 )
 
-
-def get_db():
-    db = SessionLocal()
-
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post(
@@ -71,6 +65,37 @@ def register(
     db.refresh(new_user)
 
     return new_user
+
+
+@router.patch("/activate", response_model=UserResponse)
+def activate_account(
+    activation_data: UserActivation,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not current_user.doit_changer_mot_de_passe:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ce compte est déjà activé.")
+    if len(activation_data.nouveau_mot_de_passe) < 8:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Le mot de passe doit contenir au moins 8 caractères.")
+    current_user.nom_complet = activation_data.nom_complet.strip()
+    current_user.departement = activation_data.departement.strip()
+    current_user.poste = activation_data.poste.strip()
+    current_user.mot_de_passe_hache = get_password_hash(activation_data.nouveau_mot_de_passe)
+    current_user.doit_changer_mot_de_passe = False
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.post("/forgot-password")
+def forgot_password(payload: PasswordForgotRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
+    if user:
+        admins = db.query(User).filter(User.role == "administrateur", User.statut == "approuve").all()
+        for admin in admins:
+            creer_notification(db, admin.id, "Réinitialisation demandée", f"{user.nom_complet} ({user.email}) demande une réinitialisation de mot de passe.")
+        db.commit()
+    return {"message": "Si ce compte existe, les administrateurs ont été informés."}
 
 
 @router.post(
