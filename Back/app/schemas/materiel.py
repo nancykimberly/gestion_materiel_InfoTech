@@ -5,6 +5,7 @@ class MaterielCreate(BaseModel):
     nom: str
     categorie: str
     description: str | None = None
+    image_url: str | None = None
 
     quantite_totale: int = Field(
         ge=0
@@ -21,6 +22,7 @@ class MaterielUpdate(BaseModel):
     nom: str | None = None
     categorie: str | None = None
     description: str | None = None
+    image_url: str | None = None
 
     quantite_totale: int | None = Field(
         default=None,
@@ -40,6 +42,7 @@ class MaterielResponse(BaseModel):
     nom: str
     categorie: str
     description: str | None
+    image_url: str | None
 
     quantite_totale: int
     quantite_disponible: int

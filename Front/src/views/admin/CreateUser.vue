@@ -1,0 +1,10 @@
+<script setup>
+import { reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import AdminLayout from "../../layouts/AdminLayout.vue";
+import { userService } from "../../services/api";
+const form = reactive({ email: "", mot_de_passe_temporaire: "", statut: "approuve" });
+const error = ref(""); const loading = ref(false); const router = useRouter();
+const submit = async () => { error.value = ""; loading.value = true; try { await userService.create(form); router.push("/admin/utilisateurs"); } catch (exception) { error.value = exception.message; } finally { loading.value = false; } };
+</script>
+<template><AdminLayout><section class="mx-auto max-w-2xl p-5 md:p-10"><p class="text-sm font-semibold uppercase tracking-widest text-[#3f7452]">Administration</p><h1 class="mt-2 text-3xl font-bold">Créer un utilisateur</h1><p class="mt-3 text-slate-500">Un e-mail avec le mot de passe temporaire est envoyé. L’utilisateur complètera son profil et remplacera ce mot de passe à sa première connexion.</p><div class="mt-7 rounded-2xl bg-white p-6 shadow-sm"><form class="grid gap-4" @submit.prevent="submit"><label class="form-control"><span class="label-text">Adresse e-mail</span><input v-model="form.email" type="email" class="input input-bordered" required></label><label class="form-control"><span class="label-text">Mot de passe temporaire</span><input v-model="form.mot_de_passe_temporaire" type="password" minlength="8" class="input input-bordered" required><span class="label-text-alt">Au moins 8 caractères.</span></label><label class="form-control"><span class="label-text">Statut</span><select v-model="form.statut" class="select select-bordered"><option value="approuve">Approuvé — peut activer son compte</option><option value="en_attente">En attente — connexion bloquée</option><option value="refuse">Refusé — connexion bloquée</option></select></label><p v-if="error" class="text-sm text-error">{{ error }}</p><button class="btn border-0 bg-[#17482d] text-white" :disabled="loading">{{ loading ? 'Création…' : 'Créer et envoyer l’e-mail' }}</button></form></div></section></AdminLayout></template>

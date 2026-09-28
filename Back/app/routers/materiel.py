@@ -132,6 +132,7 @@ def create_materiel(
         nom=materiel_data.nom,
         categorie=materiel_data.categorie,
         description=materiel_data.description,
+        image_url=materiel_data.image_url,
         quantite_totale=materiel_data.quantite_totale,
         quantite_disponible=materiel_data.quantite_disponible,
         statut=materiel_data.statut,
@@ -180,6 +181,9 @@ def update_materiel(
 
     if materiel_data.description is not None:
         materiel.description = materiel_data.description
+
+    if materiel_data.image_url is not None:
+        materiel.image_url = materiel_data.image_url
 
     if materiel_data.quantite_totale is not None:
         materiel.quantite_totale = materiel_data.quantite_totale

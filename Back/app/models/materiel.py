@@ -96,3 +96,5 @@ class Materiel(Base):
         "Request",
         back_populates="materiel"
     )
+
+    image_url: Mapped[str | None] = mapped_column(Text, nullable=True)

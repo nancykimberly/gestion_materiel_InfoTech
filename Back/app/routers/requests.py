@@ -161,6 +161,17 @@ admin_router = APIRouter(
 )
 
 
+@admin_router.get(
+    "",
+    response_model=list[RequestResponse]
+)
+def get_requests(
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin_user)
+):
+    return db.query(Request).order_by(Request.date_creation.desc()).all()
+
+
 # ============================================================
 # DEMANDES EN ATTENTE
 # ============================================================

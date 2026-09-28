@@ -37,7 +37,10 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: #f8faf8;
+  background:
+    radial-gradient(circle at 5% 0%, rgba(110, 173, 126, .16), transparent 27rem),
+    radial-gradient(circle at 100% 20%, rgba(205, 230, 213, .75), transparent 32rem),
+    #f5f8f5;
 }
 
 h1,
@@ -143,6 +146,37 @@ code {
 }
 
 #app { min-height: 100svh; }
+
+.glass-panel {
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(255, 255, 255, .85);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 48px rgba(18, 65, 38, .10);
+  backdrop-filter: blur(18px);
+}
+
+.card, .modal-box, .table {
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(18, 65, 38, .07);
+}
+
+.btn, .input, .select, .textarea, a {
+  transition: all .25s ease;
+}
+
+.btn:focus-visible, .input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: #397758;
+  box-shadow: 0 0 0 4px rgba(57, 119, 88, .15);
+}
+
+.btn:hover { transform: translateY(-1px); }
+
+@media (max-width: 640px) {
+  h1 { font-size: 2rem; }
+  .table { font-size: .8rem; }
+  .modal-box { margin: .75rem; max-height: calc(100vh - 1.5rem); }
+}
 
 #center {
   display: flex;

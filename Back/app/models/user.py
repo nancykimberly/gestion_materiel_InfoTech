@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -123,3 +123,11 @@ class User(Base):
         "AuditLog",
         back_populates="administrateur"
     )
+
+    doit_changer_mot_de_passe: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)

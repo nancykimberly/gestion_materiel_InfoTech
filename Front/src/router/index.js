@@ -6,10 +6,13 @@ import Catalogue from "../views/user/Catalogue.vue";
 import MesDemandes from "../views/user/MesDemandes.vue";
 import Notifications from "../views/user/Notifications.vue";
 import Dashboard from "../views/admin/Dashboard.vue";
-import Utilisateurs from "../views/admin/Utilisateurs.vue";
+import Utilisateurs from "../views/admin/UserManagement.vue";
 import Materiels from "../views/admin/Materiels.vue";
 import Demandes from "../views/admin/Demandes.vue";
 import Audit from "../views/admin/Audit.vue";
+import ActivateAccount from "../views/auth/ActivateAccount.vue";
+import CreateUser from "../views/admin/CreateUser.vue";
+import Profile from "../views/user/Profile.vue";
 import { useAuthStore } from "../stores/auth";
 
 const routes = [
@@ -23,12 +26,15 @@ const routes = [
         name: "register",
         component: RegisterView,
     },
+    { path: "/activer-compte", component: ActivateAccount, meta: { auth: true } },
     { path: "/", redirect: "/catalogue" },
     { path: "/catalogue", component: Catalogue, meta: { auth: true } },
     { path: "/demandes", component: MesDemandes, meta: { auth: true } },
     { path: "/notifications", component: Notifications, meta: { auth: true } },
+    { path: "/profil", component: Profile, meta: { auth: true } },
     { path: "/admin", component: Dashboard, meta: { auth: true, admin: true } },
     { path: "/admin/utilisateurs", component: Utilisateurs, meta: { auth: true, admin: true } },
+    { path: "/admin/utilisateurs/nouveau", component: CreateUser, meta: { auth: true, admin: true } },
     { path: "/admin/materiels", component: Materiels, meta: { auth: true, admin: true } },
     { path: "/admin/demandes", component: Demandes, meta: { auth: true, admin: true } },
     { path: "/admin/audit", component: Audit, meta: { auth: true, admin: true } },
@@ -44,6 +50,7 @@ router.beforeEach(async (to) => {
   const auth = useAuthStore();
   if (!auth.ready) await auth.restore();
   if (to.meta.auth && !auth.isAuthenticated) return "/login";
+  if (auth.user?.doit_changer_mot_de_passe && to.path !== "/activer-compte") return "/activer-compte";
   if (to.meta.admin && !auth.isAdmin) return "/catalogue";
   if ((to.path === "/login" || to.path === "/register") && auth.isAuthenticated) return auth.isAdmin ? "/admin" : "/catalogue";
 });

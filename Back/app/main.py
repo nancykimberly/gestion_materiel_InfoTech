@@ -5,6 +5,9 @@ from app.core.dependencies import (
     get_current_admin_user,
     get_current_user
 )
+from app.core.security import get_password_hash, verify_password
+from app.database.session import SessionLocal
+from app.schemas.user import UserProfileUpdate
 from app.models import User
 from app.routers.admin_users import router as admin_users_router
 from app.routers.audit_logs import router as audit_logs_router
@@ -77,6 +80,8 @@ def get_me(
         "poste": current_user.poste,
         "role": current_user.role,
         "statut": current_user.statut
+        ,"doit_changer_mot_de_passe": current_user.doit_changer_mot_de_passe
+        ,"avatar_url": current_user.avatar_url
     }
 
 
@@ -88,3 +93,24 @@ def admin_test(
         "message": "Bienvenue dans l'espace administrateur.",
         "administrateur": current_admin.nom_complet
     }
+
+
+@app.put("/api/me")
+def update_me(profile: UserProfileUpdate, current_user: User = Depends(get_current_user)):
+    if profile.nouveau_mot_de_passe:
+        if not profile.mot_de_passe_actuel or not verify_password(profile.mot_de_passe_actuel, current_user.mot_de_passe_hache):
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Le mot de passe actuel est incorrect.")
+        current_user.mot_de_passe_hache = get_password_hash(profile.nouveau_mot_de_passe)
+    current_user.nom_complet = profile.nom_complet.strip()
+    current_user.departement = profile.departement.strip()
+    current_user.poste = profile.poste.strip()
+    current_user.avatar_url = profile.avatar_url
+    db = SessionLocal()
+    try:
+        db.merge(current_user)
+        db.commit()
+        db.refresh(current_user)
+    finally:
+        db.close()
+    return {"message": "Profil mis à jour."}
