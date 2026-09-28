@@ -1,0 +1,1 @@
+<template><main class="grid min-h-screen place-items-center bg-[#f3f7f3] p-5"><section class="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl shadow-green-950/5"><RouterLink to="/login" class="text-xl font-bold text-[#17482d]">◈ InfoTech</RouterLink><slot /></section></main></template>
