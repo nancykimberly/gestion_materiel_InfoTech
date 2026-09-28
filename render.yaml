@@ -10,10 +10,10 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
-        value: REPLACE_WITH_DATABASE_URL
+        value: "postgresql://neondb_owner:npg_zcxKFH3sD8Xi@ep-holy-dust-b1zo93ub-pooler.c-5.eu-central-1.aws.neon.tech/neondb?sslmode=require"
         sync: false
       - key: JWT_SECRET_KEY
-        value: REPLACE_WITH_JWT_SECRET_KEY
+        value: "une-cle-secrete-longue-et-aleatoire"
         sync: false
       - key: JWT_ALGORITHM
         value: HS256
@@ -21,7 +21,5 @@ services:
       - key: JWT_ACCESS_TOKEN_EXPIRE_MINUTES
         value: "60"
         sync: false
-      - key: DATABASE_URL
-        fromDatabase:
-          name: infotech-db
+      # database is provided via the explicit DATABASE_URL above
     postDeploy: alembic upgrade head
