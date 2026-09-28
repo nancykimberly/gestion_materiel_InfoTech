@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: infotech-backend
+    env: python
+    repo: https://github.com/nancykimberly/gestion_materiel_InfoTech.git
+    branch: main
+    root: Back
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        value: REPLACE_WITH_DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        value: REPLACE_WITH_JWT_SECRET_KEY
+        sync: false
+      - key: JWT_ALGORITHM
+        value: HS256
+        sync: false
+      - key: JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: infotech-db
+    postDeploy: alembic upgrade head
